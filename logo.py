@@ -1,0 +1,85 @@
+import re
+from playwright.sync_api import sync_playwright
+from PIL import Image
+from io import BytesIO
+from urllib.parse import urlparse
+from colorama import Fore
+from InquirerPy import prompt
+from InquirerPy.validator import EmptyInputValidator, Validator, ValidationError
+
+
+class URLValidator(Validator):
+    def validate(self, document):
+        url = document.text
+        parsed = urlparse(url)
+        if not all([parsed.scheme, parsed.netloc]):
+            raise ValidationError(
+                message='Invalid URL, it must have format http(s)://... ',
+                cursor_position=len(document.text))
+
+
+questions = [
+    {
+        'type': 'input',
+        'name': 'url',
+        'message': 'Enter company page URL:',
+        'validate': URLValidator()
+    },
+    {
+        'type': 'input',
+        'name': 'selector',
+        'message': 'Enter CSS selector:',
+        'validate': EmptyInputValidator()
+    },
+    {
+        'type': 'input',
+        'name': 'size',
+        'message': 'Enter desired size(format 100x100) of logo:',
+        'validate': lambda val: bool(re.match(r'^\d+x\d+$', val)) or 'Use format NxM, for example: 640x480'
+    }
+]
+
+answers = prompt(questions)
+
+url = answers['url']
+selector = answers['selector']
+
+def get_logo(url: str, selector: str, size: (int, int)) -> Image:
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        page = browser.new_page()
+        page.goto(url)
+        page.wait_for_selector(selector)
+
+        element = page.query_selector(selector)
+        img_bytes = element.screenshot(type="png")
+
+        browser.close()
+
+    with Image.open(BytesIO(img_bytes)) as img:
+        if img.mode in ('RGBA', 'LA') or (img.mode == 'P' and 'transparency' in img.info):
+            background = Image.new('RGBA', img.size, (255, 255, 255, 255))
+            background.paste(img, mask=img.getchannel('A'))
+            img = background.convert('RGB')
+        else:
+            img = img.convert('RGB')
+
+        target_size = size
+
+        img.thumbnail(target_size, Image.LANCZOS)
+
+        final_im = Image.new('RGB', target_size, (255, 255, 255))
+
+        paste_x = (target_size[0] - img.width) // 2
+        paste_y = (target_size[1] - img.height) // 2
+
+        final_im.paste(img, (paste_x, paste_y))
+
+        return final_im
+
+
+image = get_logo(answers["url"], answers["selector"], [int(px) for px in answers["size"].split("x")])
+image.save("logo.png", "PNG")
+
+print(Fore.GREEN + "\nLogo has been saved into <logo.png>.")
+print(Fore.YELLOW + "Good bye and have a good luck!")
