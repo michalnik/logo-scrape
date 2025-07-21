@@ -3,13 +3,16 @@ Logo scraper
 
 ## Installation:
 ```bash
-pip install git+https://github.com/michalnik/logo-scrape.git
+pip install logo-scrape
 ```
+
+https://github.com/michalnik/logo-scrape.git
 
 ## Usage:
 ```bash
-python logo.py
+logo-scrape.py
 ```
+
 And answer questions:
 1. url of company web
 2. css selector to capture only logo picture
