@@ -1,7 +1,8 @@
-.PHONY: help venv install mypy isort lint clean run
+.PHONY: help venv install mypy isort lint clean build run
 
 PYTHON = .venv/bin/python
 PIP = .venv/bin/pip
+VALIDATE = .venv/bin/validate-pyproject
 
 help:
 	@echo "Usage:"
@@ -12,6 +13,7 @@ help:
 	@echo "  make lint        - Run mypy and isort together"
 	@echo "  make clean       - Deleting __pycache__ a .mypy_cache"
 	@echo "  make run         - Running money collection :-)"
+	@echo "  make build       - Validate and build a package"
 
 venv:
 	@if [ -d ".venv" ]; then \
@@ -37,8 +39,11 @@ lint: mypy isort
 
 clean:
 	find . -type d -name "__pycache__" -exec rm -rf {} +
-	rm -rf .mypy_cache
+	rm -vrf .mypy_cache dist *.egg-info
 	@echo "Cleaned __pycache__ and .mypy_cache"
+
+build:
+	($(VALIDATE) pyproject.toml && $(PYTHON) -m build)
 
 run: venv
 	(cd src && ../$(PYTHON) -m logo-scraper)

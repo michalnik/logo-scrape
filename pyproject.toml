@@ -59,4 +59,4 @@ repository = "https://github.com/michalnik/logo-scrape"
 
 
 [project.scripts]
-logo-scrape = "logo_scraper:main"
+logo-scrape = "logo_scrape:main"
