@@ -3,11 +3,10 @@ requires = ["setuptools>=64", "wheel", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-py-modules = ["logo_scrape"]
+packages = ["logo_scrape"]
 
 [tool.setuptools_scm]
-version_scheme = "post-release"
-local_scheme = "no-local-version"
+version_file = "logo_scrape/__init__.py"
 
 [project]
 name = "logo-scrape"
@@ -59,4 +58,4 @@ repository = "https://github.com/michalnik/logo-scrape"
 
 
 [project.scripts]
-logo-scrape = "logo_scrape:main"
+logo-scrape = "logo_scrape.logo_scrape:main"

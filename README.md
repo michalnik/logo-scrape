@@ -3,14 +3,14 @@ Logo scraper
 
 ## Installation:
 ```bash
-pip install logo-scrape
+pip install git+https://github.com/michalnik/logo-scrape.git
 ```
 
 https://github.com/michalnik/logo-scrape.git
 
 ## Usage:
 ```bash
-logo-scrape.py
+logo-scrape
 ```
 
 And answer questions:
