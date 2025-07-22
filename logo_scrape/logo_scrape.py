@@ -71,7 +71,13 @@ def get_logo(url: str, selector: str, size: tuple[int, int]) -> Image.Image:
 def main():
     answers = prompt(QUESTIONS)
 
-    image = get_logo(answers["url"], answers["selector"], [int(px) for px in answers["size"].split("x")])
+    url: str = answers["url"] if isinstance(answers["url"], str) else "https://thinkeasy.cz"
+    selector: str = answers["selector"] if isinstance(answers["selector"], str) else "header img"
+    size: str = answers["size"] if isinstance(answers["size"], str) else "100x100"
+
+    target_size: list[str] = size.split("x")
+
+    image = get_logo(url, selector, (int(target_size[0]), int(target_size[1])))
     image.save("logo.png", "PNG")
 
     print(Fore.GREEN + "\nLogo has been saved into <logo.png>.")

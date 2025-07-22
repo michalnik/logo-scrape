@@ -5,6 +5,9 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools]
 packages = ["logo_scrape"]
 
+[tool.setuptools.exclude-package-data]
+"logo_scrape" = ["mypy.ini"]
+
 [tool.setuptools_scm]
 version_file = "logo_scrape/__init__.py"
 

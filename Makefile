@@ -30,10 +30,10 @@ install: venv
 	@echo "Project installed in editable mode with dev dependencies"
 
 mypy:
-	(cd src && ../$(PYTHON) -m mypy .)
+	(cd logo_scrape && ../$(PYTHON) -m mypy .)
 
 isort:
-	(cd src && ../$(PYTHON) -m isort .)
+	(cd logo_scrape && ../$(PYTHON) -m isort .)
 
 lint: mypy isort
 
@@ -46,4 +46,4 @@ build:
 	($(VALIDATE) pyproject.toml && $(PYTHON) -m build)
 
 run: venv
-	(cd src && ../$(PYTHON) -m logo-scraper)
+	(cd logo_scrape && ../$(PYTHON) -m logo-scraper)
