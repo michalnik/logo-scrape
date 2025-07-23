@@ -46,4 +46,4 @@ build:
 	($(VALIDATE) pyproject.toml && $(PYTHON) -m build)
 
 run: venv
-	(cd logo_scrape && ../$(PYTHON) -m logo-scraper)
+	(cd logo_scrape && ../$(PYTHON) -m logo_scrape)

@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
+import os
 import re
 from io import BytesIO
+from pathlib import Path
 from urllib.parse import urlparse
 
 from colorama import Fore
@@ -9,6 +11,14 @@ from InquirerPy import prompt
 from InquirerPy.validator import EmptyInputValidator, ValidationError, Validator
 from PIL import Image
 from playwright.sync_api import sync_playwright
+
+LOGO_DIR: Path
+LOGO_DIR_STR: str = os.environ.get("LOGO_DIR", "")
+if not LOGO_DIR_STR:
+    LOGO_DIR = Path.home() / "Pictures" / "logo_scrape"
+else:
+    LOGO_DIR = Path(LOGO_DIR_STR)
+LOGO_DIR.mkdir(0o764, parents=True, exist_ok=True)
 
 
 class URLValidator(Validator):
@@ -21,6 +31,13 @@ class URLValidator(Validator):
             )
 
 
+class SizeValidator(Validator):
+    def validate(self, document):
+        size = document.text
+        if not re.match(r"^\d+x\d+$", size):
+            raise ValidationError(message="Use format NxM, for example: 640x480", cursor_position=len(document.text))
+
+
 QUESTIONS = [
     {"type": "input", "name": "url", "message": "Enter company page URL:", "validate": URLValidator()},
     {"type": "input", "name": "selector", "message": "Enter CSS selector:", "validate": EmptyInputValidator()},
@@ -28,7 +45,7 @@ QUESTIONS = [
         "type": "input",
         "name": "size",
         "message": "Enter desired size(format 100x100) of logo:",
-        "validate": lambda val: bool(re.match(r"^\d+x\d+$", val)) or "Use format NxM, for example: 640x480",
+        "validate": SizeValidator(),
     },
 ]
 
@@ -77,8 +94,13 @@ def main():
 
     target_size: list[str] = size.split("x")
 
+    logo_path = LOGO_DIR / f"{urlparse(url).netloc}_logo.png"
     image = get_logo(url, selector, (int(target_size[0]), int(target_size[1])))
-    image.save("logo.png", "PNG")
+    image.save(LOGO_DIR / f"{logo_path}", "PNG")
 
-    print(Fore.GREEN + "\nLogo has been saved into <logo.png>.")
+    print(Fore.GREEN + f"\nLogo has been saved into <{logo_path}>.")
     print(Fore.YELLOW + "Good bye and have a good luck!")
+
+
+if __name__ == "__main__":
+    main()
